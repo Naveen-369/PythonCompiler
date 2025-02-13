@@ -96,6 +96,14 @@ class Parser:
             self.match()
         return True
 
+    def consume_error(self, **kwargs):
+        key, value = list(kwargs.items())[0]
+        if len(kwargs.items()) == 2:
+            message = kwargs['message']
+        else:
+            message = value
+        if not self.consume(**{key:value}):
+            self.error_grammar(expected=message)
     def program(self):
         self.statement_list()
 
@@ -125,10 +133,8 @@ class Parser:
 
     # <assignment>     -> IDENTIFIER '=' <expression>
     def assignment(self):
-        if not self.consume(tokenType = 'IDENTIFIER'):
-            self.error_grammar(expected='IDENTIFIER')
-        if not self.consume(atr = '='):
-            self.error_grammar(expected='=')
+        self.consume_error(tokenType='IDENTIFIER')
+        self.consume_error(atr='=')
         self.expression()
 
     # < expression >     -> < term > <expression_1>
@@ -186,44 +192,35 @@ class Parser:
     # | 'if' '(' < condiiton > ')' ':' \n 'begin' < statement_list > 'end' \n 'elif' '(' condition ')' ':' \n 'begin' < statement_list > 'end'
     # | 'if' '(' < condition > ')' ':' \n 'begin' < statement_list > 'end' \n 'else' ':' 'begin' < statement_list > 'end'
     def if_statement(self):
-        if not self.consume(atr='if'):
-            self.error_grammar(expected='if')
+        self.consume_error(atr='if')
         if self.consume(atr='('):
             # consumed '('
             self.condition()
-            if not self.consume(atr=')'):
-                self.error_grammar(expected=')')
+            self.consume_error(atr=')')
         else:
             self.condition()
-        if not self.consume(atr=':'):
-            self.error_grammar(expected=':')
+        self.consume_error(atr=':')
         self.consume(tokenType='NEWLINE')
-        if not self.consume(tokenType='BLOCK BEGIN'):
-            self.error_grammar(expected='INDENTATION')
+        self.consume_error(tokenType='BLOCK BEGIN', message='INDENTATION')
         self.statement_list()
 
         while(self.consume(atr='elif')):
             if self.consume(atr='('):
                 # consumed '('
                 self.condition()
-                if not self.consume(atr=')'):
-                    self.error_grammar(expected=')')
+                self.consume_error(atr=')')
             else:
                 self.condition()
-            if not self.consume(atr=':'):
-                self.error_grammar(expected=':')
+            self.consume_error(atr=':')
             self.consume(tokenType='NEWLINE')
-            if not self.consume(tokenType='BLOCK BEGIN'):
-                self.error_grammar(expected='INDENTATION')
+            self.consume_error(tokenType='BLOCK BEGIN', message='INDENTATION')
             self.statement_list()
 
         if self.consume(atr='else'):
             # consumed 'else'
-            if not self.consume(atr=':'):
-                self.error_grammar(expected=':')
+            self.consume_error(atr=':')
             self.consume(tokenType='NEWLINE')
-            if not self.consume(tokenType='BLOCK BEGIN'):
-                self.error_grammar(expected='INDENTATION')
+            self.consume_error(tokenType='BLOCK BEGIN', message='INDENTATION')
             self.statement_list()
 
     # <condition>      -> <expression> <relop> <expression>
@@ -260,21 +257,14 @@ class Parser:
 
     # <function_def>   -> 'def' IDENTIFIER '(' <param_list> ')' '{' <statement_list> '}'
     def function_def(self):
-        if not self.consume(atr='def'):
-            self.error_grammar(expected='def')
-        if not self.consume(tokenType='IDENTIFIER'):
-            self.error_grammar(expected='IDENTIFIER')
-        if not self.consume(atr='('):
-            self.error_grammar(expected='(')
+        self.consume_error(atr='def')
+        self.consume_error(tokenType='IDENTIFIER')
+        self.consume_error(atr='(')
         self.param_list()
-        if not self.consume(atr=')'):
-            self.error_grammar(expected=')')
-        if not self.consume(tokenType='SEMICOLON'):
-            self.error_grammar(expected='SEMICOLON')
-        if not self.consume(tokenType='NEWLINE'):
-            self.error_grammar(expected='NEWLINE')
-        if not self.consume(tokenType='BLOCK BEGIN'):
-            self.error_grammar(expected='INDENTATION')
+        self.consume_error(atr=')')
+        self.consume_error(tokenType='SEMICOLON')
+        self.consume_error(tokenType='NEWLINE')
+        self.consume_error(tokenType='BLOCK BEGIN', message='INDENTATION')
         self.statement_list()
 
     # <param_list>     -> IDENTIFIER ',' <param_list> | IDENTIFIER | ε
