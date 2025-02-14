@@ -92,7 +92,7 @@ class Parser:
             # self.error_grammar(expected=value)
             return False
         else:
-            print(self.lookahead)
+            # print(self.lookahead)
             self.match()
         return True
 
@@ -235,24 +235,35 @@ class Parser:
 
     # < for_loop >       -> 'for' '(' IDENTIFIER 'in' 'range' '(' NUMBER ',' NUMBER ')' ')' ':' \n 'begin' < statement_list > 'end'
     def for_loop(self):
-        pass
+        self.consume_error(atr='for')
+        bracket_bool = False
+        if self.consume(atr='('):
+            bracket_bool = True
+        self.consume_error(tokenType='IDENTIFIER')
+        self.consume_error(atr='in')
+        self.function_call()
+        if bracket_bool:
+            self.consume_error(atr=')')
+        del bracket_bool
+        self.consume_error(atr=':')
+        self.consume(tokenType='NEWLINE')
+        self.consume_error(tokenType='BLOCK BEGIN')
+        self.statement_list()
+
+
 
     # <while_loop>     -> 'while' '(' <condition> ')' ':' \n 'begin' <statement_list> 'end'
     def while_loop(self):
-        if not self.consume(atr='while'):
-            self.error_grammar(expected='while')
+        self.consume_error(atr='while')
         if self.consume(atr='('):
             # consumed '('
             self.condition()
-            if not self.consume(atr=')'):
-                self.error_grammar(expected=')')
+            self.consume_error(atr=')')
         else:
             self.condition()
-        if not self.consume(atr=':'):
-            self.error_grammar(expected=':')
+        self.consume_error(atr=':')
         self.consume(tokenType='NEWLINE')
-        if not self.consume(tokenType='BLOCK BEGIN'):
-            self.error_grammar(expected='INDENTATION')
+        self.consume_error(tokenType='BLOCK BEGIN',message='INDENTATION')
         self.statement_list()
 
     # <function_def>   -> 'def' IDENTIFIER '(' <param_list> ')' '{' <statement_list> '}'
@@ -266,6 +277,24 @@ class Parser:
         self.consume_error(tokenType='NEWLINE')
         self.consume_error(tokenType='BLOCK BEGIN', message='INDENTATION')
         self.statement_list()
+
+    # < function_call >  -> IDENTIFIER '(' < arg_list > ')'
+
+    def function_call(self):
+        self.consume_error(tokenType='IDENTIFIER')
+        self.consume_error(atr='(')
+        self.arg_list()
+        self.consume_error(atr=')')
+
+    # < arg_list >       -> < expression > ',' < arg_list > | < expression > | ε
+    def arg_list(self):
+        self.expression()
+        if self.consume(atr=','):
+            self.arg_list()
+    # < return_statement > -> 'return' < expression >
+    def return_statement(self):
+        self.consume_error(atr='return')
+        self.expression()
 
     # <param_list>     -> IDENTIFIER ',' <param_list> | IDENTIFIER | ε
     def param_list(self):
@@ -380,7 +409,7 @@ def file_reader(inp: str) -> list:
                 text.append(line.rstrip('\n'))
     except FileNotFoundError:
         print("Error: The file was not found.")
-    print(text)
+    # print(text)
     return text
 
 
@@ -443,11 +472,11 @@ if __name__ == '__main__':
 
     file = file_reader(sys.argv[1])
 
-    print(file)
+    # print(file)
     # Token Parsing
     tokens = lexical_analyzer(file)
 
-    print(tokens)
+    # print(tokens)
     # NOW MAP OUT A GRAMMER THAT THIS PROGRAMMING LANGUAGE FOLLOWS
     # AFTER THAT CODE THE LALR PARSER BUT BEFORE THAT YOU NEED FIRST AND FOLLOW COMPUTE TO USE
 
@@ -455,3 +484,5 @@ if __name__ == '__main__':
     #     print(token)
     Parser(tokens)
     print("Parsing done")
+
+
