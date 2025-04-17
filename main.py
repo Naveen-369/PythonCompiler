@@ -18,27 +18,11 @@ FUTURE:
  implement lalr parser instead of backtracking
 """
 
-# CONSTANTS:
-# Keywords
-CONDITIONALS = {c: "CONDITIONAL" for c in ["if", "else", "then"]}
-# Operators
-OPERATORS = {op: "OPERATOR" for op in ["+", "-", "*", "/", "="]}
-# Relational Operators
-RELOP = {relop: "RELOP" for relop in ['==', '!=', '<', '<=', '>', '>=']}
-# Loops
-LOOPS = {loop: "LOOP" for loop in ['for', 'while']}
 
-class GrammarError(Exception):
-    def __init__(self, message, token=None, expected=None):
-        self.token = token
-        self.expected = expected
-        error_message = f"Grammar Error: {message}"
-        if token:
-            error_message += f" | Found: '{token}'"
-        if expected:
-            error_message += f" | Expected: {expected}"
-        super().__init__(error_message)
-
+from Components.error import GrammarError
+from Components.constants import CONDITIONALS,OPERATORS,RELOP,LOOPS
+from Components.LexicalAnalyzer.tokenGenerator.token import Token
+from Components.LexicalAnalyzer.tokenGenerator.tokenGenerator import TokenGenerator as token_gen
 
 # Grammar
 class Parser:
@@ -306,65 +290,8 @@ class Parser:
         raise GrammarError("Invalid syntax", self.lookahead, expected)
 
 
-class Token:
-    """
-    the token class classifies the words in the program into tokens like identifier, constants, etc
-    and stores a value of it.
-    """
-
-    def __init__(self, tokenType: str, atr: str = None) -> None:
-        self.tokenType = tokenType
-        self.atr = atr
-
-    def __repr__(self) -> str:
-        return f"('{self.tokenType}', '{self.atr}')"
 
 
-def token_giver(word: str) -> Token:
-    """
-    Takes a word from the code and returns a Token object with its type and attribute.
-    :param word:
-    :return Token:
-    """
-    # Keyword
-    if word in CONDITIONALS:
-        return Token("CONDITIONAL", word)
-
-    # Loops
-    if word in LOOPS:
-        return Token("LOOPS", word)
-
-    # Indentation
-    elif not word:
-        return Token("INDENTATION", '\\t')
-
-    # Operator
-    elif word in OPERATORS:
-        return Token("OPERATOR", word)
-
-    # Relational Operator
-    elif word in RELOP:
-        return Token("RELOP", word)
-
-    # Semicolon
-    elif word == ":":
-        return Token("SEMICOLON", word)
-
-    # def function
-    elif word == "def":
-        return Token("FUNCTION", word)
-
-    # Identifier
-    elif word[0].isalpha() or word[0] == '_':
-        return Token("IDENTIFIER", word)
-
-    # Constant (Update later to work for float and exponential numbers)
-    elif word[0].isdigit():
-        return Token("CONSTANT", word)
-
-    # Default to symbol if none of the above match
-    else:
-        return Token("SYMBOL", word)
 
 
 def file_reader(inp: str) -> list:
@@ -418,7 +345,7 @@ def lexical_analyzer(inp: list) -> list:
 
         # Process the actual line content
         for word in re.split(r'\s+', stripped_line):
-            lTokens.append(token_giver(word))
+            lTokens.append(token_gen(word))
 
         lTokens.append(Token("NEWLINE", "\\n"))
 
