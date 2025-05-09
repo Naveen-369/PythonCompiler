@@ -1,6 +1,7 @@
 # Grammar
 from enum import Enum
-from lexical_analyzer import Token, TokenType
+from Lexical_Analyser.Lexical_Components.Token import Token
+from Lexical_Analyser.Lexical_Components.TokenType import TokenType
 
 
 class GrammarError(Exception):

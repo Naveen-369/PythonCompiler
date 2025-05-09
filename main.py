@@ -2,7 +2,7 @@ import sys
 from enum import Enum
 from typing import List, Union
 from file_reader import *
-from lexical_analyzer import *
+from Lexical_Analyser.lexicalAnalyzer import lexical_analyzer
 from Parser import *
 '''
 classes camelCase
