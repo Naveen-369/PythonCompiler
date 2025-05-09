@@ -1,6 +1,6 @@
 
 from typing import override
-from TokenType import TokenType
+from Lexical_Analyser.Lexical_Components.TokenType import TokenType
 
 class Token:
     """

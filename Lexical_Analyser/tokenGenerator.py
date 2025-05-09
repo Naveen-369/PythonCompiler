@@ -1,6 +1,6 @@
 from Components.Constants import *
-from Lexical_Components.TokenType import TokenType
-from Lexical_Components.Token import Token
+from Lexical_Analyser.Lexical_Components.TokenType import TokenType
+from Lexical_Analyser.Lexical_Components.Token import Token
 import re,keyword
 
 

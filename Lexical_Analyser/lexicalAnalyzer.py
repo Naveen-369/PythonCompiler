@@ -1,9 +1,9 @@
 from file_reader import FileObject
 from typing import List
 import re
-from tokenGenerator import token_gen
-from Lexical_Components.Token import Token
-from Lexical_Components.TokenType import TokenType
+from Lexical_Analyser.tokenGenerator import token_gen
+from Lexical_Analyser.Lexical_Components.Token import Token
+from Lexical_Analyser.Lexical_Components.TokenType import TokenType
 
 def lexical_analyzer(inp: FileObject) -> List[Token]:
     """
