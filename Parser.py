@@ -2,19 +2,7 @@
 from enum import Enum
 from Lexical_Analyser.Lexical_Components.Token import Token
 from Lexical_Analyser.Lexical_Components.TokenType import TokenType
-
-
-class GrammarError(Exception):
-    def __init__(self, message, token=None, expected=None):
-        self.token = token
-        self.expected = expected
-        error_message = f"Grammar Error: {message}"
-        if token:
-            error_message += f" | Found: {token.tokenType} : '{token.atr}'"
-            error_message += f" at line no {token.lineNo}, {token.colNo}"
-        if expected:
-            error_message += f" | Expected: {expected}"
-        super().__init__(error_message)
+from Lexical_Analyser.Lexical_Components.GrammarErrorException import GrammarError
 
 
 class Parser:

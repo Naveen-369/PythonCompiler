@@ -1,6 +1,6 @@
-from TokenType import TokenType
+from .TokenType import TokenType
 
-class GrammerError(Exception): # Inherit the default exception class
+class GrammarError(Exception): # Inherit the default exception class
     def __init__(self,Errmessage:str,token:TokenType=None,excepted:TokenType=None):
         self.token=token
         self.excepted=excepted
